@@ -1,4 +1,5 @@
 #include "RegexAST.hpp"
+#include "NfaState.hpp"
 
 #include <fmt/core.h>
 #include <fmt/ranges.h>
