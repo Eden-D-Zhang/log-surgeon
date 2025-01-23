@@ -1,5 +1,4 @@
 #include "RegexAST.hpp"
-#include "NfaState.hpp"
 
 #include <fmt/core.h>
 #include <fmt/ranges.h>
@@ -7,22 +6,23 @@
 
 namespace log_surgeon::finite_automata {
 template<typename TypedNfaState>
-[[nodiscard]] auto RegexAST<TypedNfaState>::serialize_negative_tags() const -> std::u32string {
-    std::u32string negative_tags_serialized;
-    if (m_negative_tags.empty()) {
-        return U"";
-    }
-
-    auto const transformed_tags = m_negative_tags
-            | std::ranges::views::transform([](Tag const* tag) { return tag->get_name(); });
-    for (auto const& tag_name : transformed_tags) {
-        if (false == negative_tags_serialized.empty()) {
-            negative_tags_serialized += U", ";  // Add separator
+[[nodiscard]] auto serialize_negative_tags() const -> std::u32string {
+        if (m_negative_tags.empty()) {
+            return U"";
         }
-        negative_tags_serialized += tag_name;
+
+        auto const transformed_negative_tags
+                = m_negative_tags | std::ranges::views::transform([](Tag const* tag) {
+                      return fmt::format("<~{}>", tag->get_name());
+                  });
+        auto const negative_tags_string
+                = fmt::format("{}", fmt::join(transformed_negative_tags, ""));
+
+        return fmt::format(
+                U"{}",
+                std::u32string(negative_tags_string.begin(), negative_tags_string.end())
+        );
     }
-    return fmt::format(U"[^{}]", negative_tags_serialized);
-}
 
 template <typename TypedNfaState>
 [[nodiscard]] auto RegexASTEmpty<TypedNfaState>::serialize() const -> std::u32string {
@@ -142,5 +142,5 @@ template auto RegexASTMultiplication<Utf8NfaState>::serialize() const -> std::u3
 template auto RegexASTCapture<ByteNfaState>::serialize() const -> std::u32string;
 template auto RegexASTCapture<Utf8NfaState>::serialize() const -> std::u32string;
 template auto RegexASTGroup<ByteNfaState>::serialize() const -> std::u32string;
-template auto RegexASTGroup<Utf8NfaState>::serialize() const -> std::u32string;           
+template auto RegexASTGroup<Utf8NfaState>::serialize() const -> std::u32string;
 } // namespace log_surgeon::finite_automata
