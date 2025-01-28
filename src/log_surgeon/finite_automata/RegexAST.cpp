@@ -6,7 +6,7 @@
 
 namespace log_surgeon::finite_automata {
 template<typename TypedNfaState>
-[[nodiscard]] auto RegexAst<TypedNfaState>::serialize_negative_tags() const -> std::u32string {
+[[nodiscard]] auto RegexAST<TypedNfaState>::serialize_negative_tags() const -> std::u32string {
         if (m_negative_tags.empty()) {
             return U"";
         }
